@@ -9,20 +9,26 @@ export function CoverageBar({
   activeCategory,
   onSelect,
   categoryColors,
+  counts,
 }: {
   categories: Category[];
   tab: Tab;
   activeCategory: string;
   onSelect: (code: string) => void;
   categoryColors: Record<string, string>;
+  counts?: Record<string, number>;
 }) {
   const { t, locale } = useI18n();
   const topLevel = categories.filter((category) => category.level === 1);
-  const counts = topLevel.map((category) => ({
+  const items = topLevel.map((category) => ({
     category,
-    count: tab === "skills" ? category.skillCount : category.agentCount,
+    count: counts
+      ? (counts[category.code] ?? 0)
+      : tab === "skills"
+        ? category.skillCount
+        : category.agentCount,
   }));
-  const total = counts.reduce((sum, item) => sum + item.count, 0);
+  const total = items.reduce((sum, item) => sum + item.count, 0);
 
   return (
     <section className="border-b border-line bg-paper">
@@ -40,7 +46,7 @@ export function CoverageBar({
         <div className="mt-3 flex h-2.5 w-full gap-px overflow-hidden" aria-hidden="true">
           {total === 0
             ? null
-            : counts
+            : items
                 .filter((item) => item.count > 0)
                 .map(({ category, count }) => (
                   <button
@@ -70,8 +76,7 @@ export function CoverageBar({
           >
             {t("coverage.all")}
           </button>
-          {topLevel.map((category) => {
-            const count = tab === "skills" ? category.skillCount : category.agentCount;
+          {items.map(({ category, count }) => {
             if (count === 0) return null;
             const active = activeCategory === category.code;
             return (

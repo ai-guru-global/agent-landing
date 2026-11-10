@@ -17,7 +17,7 @@ import {
 } from "../lib/catalog";
 import { buildWizardMarkdown } from "../lib/briefs";
 import { useI18n } from "../lib/i18n";
-import { Badge, CategoryDot, EmptyState, SectionLabel } from "./ui";
+import { AgentTypeMark, Badge, CategoryDot, EmptyState, SectionLabel } from "./ui";
 
 interface WizardProps {
   catalog: Catalog;
@@ -521,6 +521,7 @@ function RecommendationRow({
             <Badge>{t("wizard.alternative")}</Badge>
           )}
           <span className="alm-mono text-[10px] text-soft">{agent.catalogId}</span>
+          <AgentTypeMark type={agent.agentType} />
           <Badge tone={agent.isPaid ? "amber" : "green"}>{pricingLabel(agent.isPaid, locale)}</Badge>
         </div>
         <button

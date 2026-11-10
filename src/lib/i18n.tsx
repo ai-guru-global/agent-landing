@@ -47,8 +47,18 @@ const messages: Record<Locale, Record<string, string>> = {
 
     "workspace.agents": "Agent 目录",
     "workspace.skills": "Skills 技能库",
-    "workspace.agentsLead": "官方 Agent 产品、能力与接入方式。",
+    "workspace.agentsLead": "独立 Agent 产品与云产品内置助手的官方能力、接入与计费。",
     "workspace.skillsLead": "官方 Skills、安装命令与 Token 规模。",
+
+    "agentType.all": "全部 Agent",
+    "agentType.standalone": "独立 Agent",
+    "agentType.embedded": "云产品内置",
+    "agentType.standaloneShort": "独立产品",
+    "agentType.embeddedShort": "产品内置",
+    "agentType.type": "Agent 类型",
+    "agentType.legend":
+      "独立 Agent 以独立产品/平台身份提供能力；云产品内置是嵌入具体云产品控制台的助手。",
+    "agentType.legendShort": "独立 Agent = 产品/平台级；云产品内置 = 控制台助手",
 
     "search.placeholder": "搜索名称、类目、能力或关键词…",
     "search.hint": "按 / 聚焦搜索",
@@ -188,6 +198,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "compare.sites": "站点",
     "compare.interfaces": "接入",
     "compare.category": "类目",
+    "compare.agentType": "Agent 类型",
     "compare.likes": "点赞",
     "compare.id": "编号",
     "compare.name": "Agent",
@@ -316,8 +327,19 @@ const messages: Record<Locale, Record<string, string>> = {
 
     "workspace.agents": "Agent catalog",
     "workspace.skills": "Skills library",
-    "workspace.agentsLead": "Official agent products, capabilities and access modes.",
+    "workspace.agentsLead":
+      "Official capabilities, access modes and billing for standalone agents and built-in cloud-product assistants.",
     "workspace.skillsLead": "Official skills, install commands and token footprint.",
+
+    "agentType.all": "All agents",
+    "agentType.standalone": "Standalone agents",
+    "agentType.embedded": "Built-in agents",
+    "agentType.standaloneShort": "Standalone",
+    "agentType.embeddedShort": "Built-in",
+    "agentType.type": "Agent type",
+    "agentType.legend":
+      "Standalone agents are product/platform-level capabilities; built-in agents are assistants embedded in a cloud product console.",
+    "agentType.legendShort": "Standalone = product/platform-level; built-in = console assistant",
 
     "search.placeholder": "Search names, categories, capabilities or keywords…",
     "search.hint": "Press / to focus search",
@@ -457,6 +479,7 @@ const messages: Record<Locale, Record<string, string>> = {
     "compare.sites": "Sites",
     "compare.interfaces": "Access",
     "compare.category": "Category",
+    "compare.agentType": "Agent type",
     "compare.likes": "Likes",
     "compare.id": "ID",
     "compare.name": "Agent",

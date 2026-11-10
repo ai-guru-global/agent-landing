@@ -1,6 +1,7 @@
 import type {
   AccessFilter,
   Agent,
+  AgentType,
   Category,
   Locale,
   PriceFilter,
@@ -110,6 +111,20 @@ export function pricingLabel(isPaid: boolean, locale: Locale): string {
   return locale === "zh" ? "付费" : "Paid";
 }
 
+export function agentTypeLabelKey(type: AgentType): string {
+  return type === "standalone" ? "agentType.standalone" : "agentType.embedded";
+}
+
+export function agentTypeShortKey(type: AgentType): string {
+  return type === "standalone" ? "agentType.standaloneShort" : "agentType.embeddedShort";
+}
+
+export function billingNote(agent: Agent, locale: Locale): string {
+  return locale === "en"
+    ? agent.billingLogicEn || agent.billingLogic
+    : agent.billingLogic;
+}
+
 export function tokenizeQuery(query: string): string[] {
   return query.trim().toLowerCase().split(/\s+/).filter(Boolean);
 }
@@ -164,6 +179,7 @@ export function matchesTokens(haystack: string, tokens: string[]): boolean {
 export interface AgentFilterOptions {
   query: string;
   category: string;
+  agentType: AgentType | "all";
   price: PriceFilter;
   access: AccessFilter;
   site: SiteFilter;
@@ -173,6 +189,7 @@ export function filterAgents(agents: Agent[], options: AgentFilterOptions): Agen
   const tokens = tokenizeQuery(options.query);
   return agents.filter((agent) => {
     if (options.category && agent.categoryCode !== options.category) return false;
+    if (options.agentType !== "all" && agent.agentType !== options.agentType) return false;
     if (options.price === "free" && agent.isPaid) return false;
     if (options.price === "paid" && !agent.isPaid) return false;
     if (options.access !== "all" && !agent.supportedInterfaces.includes(options.access)) {

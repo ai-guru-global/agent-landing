@@ -3,6 +3,8 @@ import { Copy, ExternalLink, X } from "lucide-react";
 import type { Agent } from "../types";
 import { useDialogFocus } from "../hooks/useDialogFocus";
 import {
+  agentTypeLabelKey,
+  billingNote,
   formatNumber,
   interfaceLabel,
   pricingLabel,
@@ -40,6 +42,15 @@ export function CompareModal({
       values: agents.map((agent) => agent.catalogId),
       render: (agent) => <span className="alm-mono whitespace-nowrap text-[11px] text-soft">{agent.catalogId}</span>,
       diffable: false,
+    },
+    {
+      label: t("compare.agentType"),
+      values: agents.map((agent) => agent.agentType),
+      render: (agent) => (
+        <Badge tone={agent.agentType === "standalone" ? "blue" : "default"}>
+          {t(agentTypeLabelKey(agent.agentType))}
+        </Badge>
+      ),
     },
     {
       label: t("compare.category"),
@@ -142,10 +153,10 @@ export function CompareModal({
     },
     {
       label: t("detail.billing"),
-      values: agents.map((agent) => pick(agent.billingLogic, agent.billingLogicEn)),
+      values: agents.map((agent) => billingNote(agent, locale)),
       render: (agent) => (
         <p className="text-[11px] leading-5 text-muted">
-          {pick(agent.billingLogic, agent.billingLogicEn) || t("detail.billingFallback")}
+          {billingNote(agent, locale) || t("detail.billingFallback")}
         </p>
       ),
     },

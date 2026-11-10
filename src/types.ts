@@ -1,5 +1,6 @@
 export type Locale = "zh" | "en";
 export type Tab = "agents" | "skills" | "wizard";
+export type AgentType = "standalone" | "embedded";
 
 export interface Category {
   code: string;
@@ -38,6 +39,7 @@ export interface ConsoleConfig {
 export interface Agent {
   catalogId: string;
   id: string;
+  agentType: AgentType;
   name: string;
   nameEn: string;
   description: string;
@@ -96,6 +98,11 @@ export interface CatalogMeta {
   skillCount: number;
   categoryCount: number;
   activeCategoryCount: number;
+  agentTypeCounts: {
+    standalone: number;
+    embedded: number;
+  };
+  agentTypeSource: string;
 }
 
 export interface Catalog {

@@ -4,7 +4,7 @@ import {
   SlidersHorizontal,
   X,
 } from "lucide-react";
-import type { Agent, Category, SortAgents } from "../types";
+import type { Agent, AgentType, Category, SortAgents } from "../types";
 import {
   formatNumber,
   interfaceLabel,
@@ -13,6 +13,7 @@ import {
 } from "../lib/catalog";
 import { useI18n } from "../lib/i18n";
 import {
+  AgentTypeMark,
   Badge,
   CategoryDot,
   EmptyState,
@@ -30,6 +31,9 @@ interface AgentBrowserProps {
   onQuery: (value: string) => void;
   sort: SortAgents;
   onSort: (value: SortAgents) => void;
+  agentType: AgentType | "all";
+  onAgentType: (value: AgentType | "all") => void;
+  typeCounts: Record<"all" | AgentType, number>;
   category: string;
   onCategory: (value: string) => void;
   price: "all" | "free" | "paid";
@@ -54,6 +58,9 @@ export function AgentBrowser({
   onQuery,
   sort,
   onSort,
+  agentType,
+  onAgentType,
+  typeCounts,
   category,
   onCategory,
   price,
@@ -111,6 +118,55 @@ export function AgentBrowser({
               ariaLabel={t("sort.label")}
             />
           </div>
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <div
+            className="flex max-w-full overflow-x-auto border border-line"
+            role="group"
+            aria-label={t("agentType.type")}
+            title={t("agentType.legend")}
+          >
+            {(
+              [
+                { value: "all" as const, label: t("agentType.all"), activeClass: "bg-ink text-white" },
+                {
+                  value: "standalone" as const,
+                  label: t("agentType.standalone"),
+                  activeClass: "bg-blue text-white",
+                },
+                {
+                  value: "embedded" as const,
+                  label: t("agentType.embedded"),
+                  activeClass: "bg-muted text-white",
+                },
+              ] as const
+            ).map((item) => {
+              const active = agentType === item.value;
+              return (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() => onAgentType(item.value)}
+                  aria-pressed={active}
+                  className={`flex shrink-0 items-center gap-1.5 border-r border-line px-2.5 py-1.5 text-[11px] transition-colors last:border-r-0 ${
+                    active ? item.activeClass : "bg-paper text-muted hover:bg-mist"
+                  }`}
+                >
+                  {item.label}
+                  <span
+                    className={`alm-mono text-[10px] ${
+                      active ? "text-white/65" : "text-soft"
+                    }`}
+                  >
+                    {formatNumber(typeCounts[item.value], locale)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div className="mt-1.5 hidden text-[10px] text-soft lg:block">
+          {t("agentType.legendShort")}
         </div>
         <div className="mt-3">
           <SearchInput value={query} onChange={onQuery} placeholder={t("search.placeholder")} />
@@ -253,11 +309,17 @@ export function AgentBrowser({
                               query={query}
                             />
                           </span>
-                          <span className="mt-0.5 block truncate text-[11px] text-muted">
-                            <Highlight
-                              text={locale === "en" && agent.nameEn ? agent.name : agent.nameEn}
-                              query={query}
-                            />
+                          <span className="mt-0.5 flex min-w-0 items-center gap-1.5 text-[11px] text-muted">
+                            <AgentTypeMark type={agent.agentType} />
+                            <span className="text-line" aria-hidden="true">
+                              ·
+                            </span>
+                            <span className="truncate">
+                              <Highlight
+                                text={locale === "en" && agent.nameEn ? agent.name : agent.nameEn}
+                                query={query}
+                              />
+                            </span>
                           </span>
                         </button>
                       </td>
@@ -361,6 +423,7 @@ function AgentMobileRow({
           <CategoryDot color={color} size={6} />
           {locale === "en" && agent.categoryNameEn ? agent.categoryNameEn : agent.categoryName}
         </Badge>
+        <AgentTypeMark type={agent.agentType} className="px-0.5" />
         <Badge tone={agent.isPaid ? "amber" : "green"}>
           {pricingLabel(agent.isPaid, locale)}
         </Badge>

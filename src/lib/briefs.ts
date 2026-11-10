@@ -1,5 +1,6 @@
 import type { Agent, Catalog, Locale, Skill } from "../types";
 import {
+  agentTypeLabelKey,
   formatDate,
   formatNumber,
   formatTokenRange,
@@ -49,13 +50,13 @@ export function buildCompareMarkdown(
     `> ${t("footer.source")} · ${t("footer.snapshot", { date })}`,
     `> ${t("footer.disclaimer")}`,
     "",
-    `| ${t("compare.id")} | ${t("compare.name")} | ${t("compare.category")} | ${t("compare.pricing")} | ${t("compare.interfaces")} | ${t("compare.sites")} | ${t("compare.likes")} |`,
-    "| --- | --- | --- | --- | --- | --- | --- |",
+    `| ${t("compare.id")} | ${t("compare.name")} | ${t("compare.agentType")} | ${t("compare.category")} | ${t("compare.pricing")} | ${t("compare.interfaces")} | ${t("compare.sites")} | ${t("compare.likes")} |`,
+    "| --- | --- | --- | --- | --- | --- | --- | --- |",
   ];
 
   for (const agent of agents) {
     lines.push(
-      `| ${agent.catalogId} | ${agentName(agent, locale)} | ${categoryName(agent, locale)} | ${pricingLabel(agent.isPaid, locale)} | ${agent.supportedInterfaces.map((value) => interfaceLabel(value, locale)).join(" / ") || "—"} | ${siteSummary(agent.publishSites, locale)} | ${formatNumber(agent.likeCount, locale)} |`,
+      `| ${agent.catalogId} | ${agentName(agent, locale)} | ${t(agentTypeLabelKey(agent.agentType))} | ${categoryName(agent, locale)} | ${pricingLabel(agent.isPaid, locale)} | ${agent.supportedInterfaces.map((value) => interfaceLabel(value, locale)).join(" / ") || "—"} | ${siteSummary(agent.publishSites, locale)} | ${formatNumber(agent.likeCount, locale)} |`,
     );
   }
 
@@ -96,7 +97,7 @@ export function buildWizardMarkdown(
 
   agentRecommendations.slice(0, 3).forEach((item, index) => {
     lines.push(
-      `${index + 1}. ${item.agent.catalogId} ${agentName(item.agent, locale)} · ${categoryName(item.agent, locale)} · ${t("common.conditionsMet", { count: item.conditionsMet })}`,
+      `${index + 1}. ${item.agent.catalogId} ${agentName(item.agent, locale)} · ${t(agentTypeLabelKey(item.agent.agentType))} · ${categoryName(item.agent, locale)} · ${t("common.conditionsMet", { count: item.conditionsMet })}`,
     );
     lines.push(`   - ${t("wizard.why")}: ${reasonLabels(item.reasons, t).join(" / ")}`);
     lines.push(`   - ${t("common.official")}: ${item.agent.usageGuideUrl || t("common.na")}`);

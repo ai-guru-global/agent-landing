@@ -11,14 +11,17 @@ Agent Landing 是独立选型工具，不是阿里云官方产品。数据来自
 | 指标 | 数值 |
 | --- | --- |
 | Agent | 36 |
+| 独立 Agent 产品 | 14 |
+| 云产品内置 Agent | 22 |
 | Skills | 328 |
 | 活跃类目 | 18 |
 | 免费 Agent | 15 |
-| Skill 累计安装 | 303,560 |
+| Skill 累计安装 | 303,568 |
 | 数据来源 | [agentcatalog.aliyun.com](https://agentcatalog.aliyun.com/) |
 
 ## 能做什么
 
+- **独立 Agent / 云产品内置 Agent 分组**：Agent 目录顶部提供类型切换，数据与界面都显式区分独立产品与云产品控制台内置助手。
 - **全库检索与多维筛选**：按名称、类目、能力、关键词搜索；按类目、计费、接入方式、站点、Token 规模筛选。
 - **Agent 对比**：最多同时对比 3 个 Agent，官方字段并排展示，差异项自动标记，可复制 Markdown 对比摘要。
 - **场景选型向导**：用「任务场景 × 接入方式 × 预算 × 站点」四个条件收敛候选，推荐结果给出可核对的条件与理由，而不是黑盒分数。
@@ -26,6 +29,17 @@ Agent Landing 是独立选型工具，不是阿里云官方产品。数据来自
 - **中英双语**：全站 UI 与目录数据均支持中文 / English 切换。
 - **可分享状态**：搜索、筛选、排序、对比、详情、选型向导均同步到 URL，可直接分享当前视图。
 - **可刷新快照**：数据抓取脚本调用官方公开 API，不需要鉴权。
+
+## Agent 类型
+
+目录中的 36 个 Agent 在数据层标记为两类，并在列表、详情、对比和选型向导中显示：
+
+- **独立 Agent（14）**：以独立产品/平台/角色身份提供能力，不依附于某个云产品控制台。例如 OpenAgent、STAROps 智能运维助手、PAIRec 智能体、小PAI、WinNexO、容器服务 Agent、系统智能专家、云上数字网工、安全运营 Agent、DataBridge、数据治理智能体、Data Agent for Analytics / Forecast、弹性计算 Agent。
+- **云产品内置（22）**：嵌入具体云产品控制台/体验的助手，用于该产品的问答、诊断、配置或运维。例如瑶池数据库 Agent、RDS AI 助手、OSS Agent、Kafka Kopilot、RAM 控制台 AI 助手、ESA AI 助手等。
+
+判定边界：像 DAS Agent、PolarDB Agent Express、ROS 智能交付这类能力虽然很强，但仍作为对应云产品的一部分发布，归入「云产品内置」；以独立产品/平台身份发布的 Agent 归入「独立 Agent」。
+
+分类维护在 [`scripts/agent-types.json`](scripts/agent-types.json)。如果团队口径不同，直接修改该文件后执行 `npm run fetch` 即可，界面不需要改动；未列出的新 Agent 默认按 `embedded` 处理并在抓取日志中告警。
 
 ## 更多界面
 
@@ -58,7 +72,7 @@ npm run typecheck  # 仅类型检查
 npm run fetch
 ```
 
-脚本位于 `scripts/fetch-catalog.mjs`，会调用以下公开接口并把归一化结果写入 `public/data/catalog.json`：
+脚本位于 `scripts/fetch-catalog.mjs`，会调用以下公开接口并把归一化结果写入 `public/data/catalog.json`。Agent 类型来自 `scripts/agent-types.json`，抓取时会一起写快照：
 
 - `GET /api/public/categories` — 类目树与类目计数
 - `GET /api/public/agents/search?pageSize=100&pageNum=1` — 36 个 Agent
@@ -76,6 +90,7 @@ agent-landing/
 │   ├── data/catalog.json        # 官方目录快照（36 Agents / 328 Skills）
 │   └── favicon.svg
 ├── scripts/
+│   ├── agent-types.json         # 独立 Agent / 云产品内置 分类映射
 │   └── fetch-catalog.mjs        # 官方 API 抓取与归一化
 ├── src/
 │   ├── components/              # 目录、对比、详情、向导、筛选等界面

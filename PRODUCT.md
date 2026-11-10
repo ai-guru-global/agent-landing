@@ -27,7 +27,7 @@ The catalog is a starting dataset, not the permanent boundary. The data layer is
 
 ## Positioning
 
-The official catalog tells you what exists. Agent Landing tells you what fits: it joins the agent portfolio, the skill library, official feature/interface/billing facts, and a scenario-driven recommender into one explainable shortlist. It is an independent selection layer, not an Alibaba Cloud product.
+The official catalog tells you what exists. Agent Landing tells you what fits: it joins the agent portfolio, the skill library, official feature/interface/billing facts, and a scenario-driven recommender into one explainable shortlist. It also separates standalone agent products from assistants embedded in a specific cloud product console, because the two are bought, deployed, and evaluated differently. It is an independent selection layer, not an Alibaba Cloud product.
 
 ## Operating Context
 
@@ -36,6 +36,7 @@ Visitors arrive with a role or a task, not a product SKU. They scan categories, 
 ## Capabilities and Constraints
 
 - Data snapshot: 36 agents, 328 skills, 18 active top-level categories (22 raw skill groups including 4 empty), fetched 2026-11-10 from `agentcatalog.aliyun.com` public API.
+- Agent type classification: 14 standalone product/platform agents and 22 cloud-product built-in assistants. The curated mapping lives in `scripts/agent-types.json`; it is a primary grouping in the agent catalog and is shown in list, detail, compare, and wizard views.
 - Agent fields available: Chinese/English name and description, category/subcategory, official feature sets, publish sites, supported interfaces, free/paid flag, billing note, OpenAPI configs, console links, likes, official usage guide.
 - Skill fields available: Chinese/English name and description, category/subcategory, GitHub path, min/max token footprint, install count, likes, version, updated date, official install command.
 - All retrieval, filtering, comparison, and recommendation run client-side; no account, no backend, no tracking.

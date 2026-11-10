@@ -2,7 +2,7 @@ import { ArrowRight, GitCompare } from "lucide-react";
 import type { Agent, CatalogMeta, Skill, Tab } from "../types";
 import { formatNumber, pricingLabel } from "../lib/catalog";
 import { useI18n } from "../lib/i18n";
-import { Badge, CategoryDot } from "./ui";
+import { AgentTypeMark, Badge, CategoryDot } from "./ui";
 
 export function Briefing({
   meta,
@@ -142,6 +142,10 @@ export function Briefing({
                           {locale === "en" && agent.categoryNameEn
                             ? agent.categoryNameEn
                             : agent.categoryName}
+                          <span className="text-line" aria-hidden="true">
+                            ·
+                          </span>
+                          <AgentTypeMark type={agent.agentType} />
                         </span>
                       </span>
                       <Badge tone={agent.isPaid ? "amber" : "green"}>

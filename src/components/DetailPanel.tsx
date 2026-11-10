@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import type { Agent, Catalog, Skill } from "../types";
 import {
+  agentTypeLabelKey,
+  billingNote,
   formatDate,
   formatNumber,
   formatTokenRange,
@@ -115,7 +117,7 @@ function AgentDetail({
 }) {
   const { t, locale, pick } = useI18n();
   const color = categoryColors[agent.categoryCode] ?? "#6f6f6f";
-  const billing = pick(agent.billingLogic, agent.billingLogicEn) || t("detail.billingFallback");
+  const billing = billingNote(agent, locale) || t("detail.billingFallback");
   const groups = agent.features.reduce<Record<string, typeof agent.features>>((acc, feature) => {
     const key = pick(feature.setName, feature.setNameEn);
     (acc[key] ??= []).push(feature);
@@ -137,6 +139,9 @@ function AgentDetail({
             {locale === "en" && agent.categoryNameEn ? agent.categoryNameEn : agent.categoryName}
           </Badge>
           {agent.subCategoryName ? <Badge>{pick(agent.subCategoryName, agent.subCategoryNameEn)}</Badge> : null}
+          <Badge tone={agent.agentType === "standalone" ? "blue" : "default"}>
+            {t(agentTypeLabelKey(agent.agentType))}
+          </Badge>
           <Badge tone={agent.isPaid ? "amber" : "green"}>{pricingLabel(agent.isPaid, locale)}</Badge>
           {agent.publishSites.map((site) => (
             <Badge key={site}>{siteLabel(site, locale)}</Badge>

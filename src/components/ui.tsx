@@ -1,6 +1,7 @@
 import { forwardRef, type ReactNode } from "react";
 import { Check, ChevronDown, Search, SearchX, X } from "lucide-react";
-import { tokenizeQuery } from "../lib/catalog";
+import type { AgentType } from "../types";
+import { agentTypeShortKey, tokenizeQuery } from "../lib/catalog";
 import { useI18n } from "../lib/i18n";
 
 function escapeRegExp(value: string) {
@@ -57,6 +58,30 @@ export function CategoryDot({ color, size = 8 }: { color: string; size?: number 
       className="inline-block shrink-0"
       style={{ width: size, height: size, background: color }}
     />
+  );
+}
+
+export function AgentTypeMark({
+  type,
+  className = "",
+}: {
+  type: AgentType;
+  className?: string;
+}) {
+  const { t } = useI18n();
+  const standalone = type === "standalone";
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center gap-1 text-[10px] ${
+        standalone ? "text-blue-dark" : "text-soft"
+      } ${className}`}
+    >
+      <span
+        className={`h-1.5 w-1.5 ${standalone ? "bg-blue" : "bg-soft"}`}
+        aria-hidden="true"
+      />
+      {t(agentTypeShortKey(type))}
+    </span>
   );
 }
 

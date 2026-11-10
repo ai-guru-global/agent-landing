@@ -1,0 +1,43 @@
+{
+  "note": "独立 Agent = 以独立产品/平台/角色身份提供能力，不是某个云产品控制台里的内嵌助手；云产品内置 = 嵌入具体云产品控制台/体验的助手。新增 Agent 时请在此归类；未列出的 Agent 默认按 embedded 处理。",
+  "standalone": [
+    "learn-pairec-agent",
+    "agentone-winnexo",
+    "acs-agent",
+    "learn-agentic-pai",
+    "aidbs-databridge",
+    "aidbs-metaagent",
+    "alinux-system-agent",
+    "sas-secopsagent",
+    "netana-networkaipal",
+    "starops-opsagent",
+    "openagent-core",
+    "aidbs-dataagentforanalytics",
+    "aidbs-forecastagent",
+    "ecs-ecagent"
+  ],
+  "embedded": [
+    "hdm-yaochi-agent",
+    "emapreduce-emr-diagnosis",
+    "hologram-hologres-agent-data",
+    "aidbs-aidbs-dasagent-for-aiops",
+    "polardb-agent-express",
+    "gws-wuying-assistant",
+    "cadt-agent",
+    "mse-promptcopilot",
+    "odps-maxagent",
+    "oss-agent",
+    "cfw-secops",
+    "esa-agent",
+    "polardb-dataagent",
+    "dide-dataagent",
+    "rds-copilot",
+    "ads-diagnosis",
+    "ros-assistant",
+    "ros-deployment",
+    "alikafka-kopilot",
+    "oos-chatops",
+    "ram-assistant",
+    "config-compliance"
+  ]
+}

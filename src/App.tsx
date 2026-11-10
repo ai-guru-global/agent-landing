@@ -3,6 +3,7 @@ import { AlertTriangle, RefreshCw } from "lucide-react";
 import type {
   AccessFilter,
   Agent,
+  AgentType,
   DetailTarget,
   PriceFilter,
   SiteFilter,
@@ -47,6 +48,7 @@ interface UrlState {
   tab: Tab;
   query: string;
   category: string;
+  agentType: AgentType | "all";
   price: PriceFilter;
   access: AccessFilter;
   site: SiteFilter;
@@ -82,6 +84,11 @@ function readUrlState(): UrlState {
     tab: oneOf(params.get("tab"), ["agents", "skills", "wizard"] as const, "agents"),
     query: params.get("q") ?? "",
     category: params.get("cat") ?? "",
+    agentType: oneOf(
+      params.get("atype"),
+      ["all", "standalone", "embedded"] as const,
+      "all",
+    ),
     price: oneOf(params.get("price"), ["all", "free", "paid"] as const, "all"),
     access: oneOf(params.get("access"), ["all", "console", "openAPI"] as const, "all"),
     site: oneOf(
@@ -148,6 +155,7 @@ export function App() {
   const [tab, setTab] = useState<Tab>(initial.tab);
   const [query, setQuery] = useState(initial.query);
   const [category, setCategory] = useState(initial.category);
+  const [agentType, setAgentType] = useState<AgentType | "all">(initial.agentType);
   const [price, setPrice] = useState<PriceFilter>(initial.price);
   const [access, setAccess] = useState<AccessFilter>(initial.access);
   const [site, setSite] = useState<SiteFilter>(initial.site);
@@ -186,14 +194,43 @@ export function App() {
     ? catalog.skills.reduce((sum, skill) => sum + skill.installCount, 0)
     : 0;
 
+  const agentsByType = useMemo(
+    () =>
+      catalog
+        ? catalog.agents.filter(
+            (agent) => agentType === "all" || agent.agentType === agentType,
+          )
+        : [],
+    [catalog, agentType],
+  );
+
+  const typeCounts = useMemo(
+    () => ({
+      all: catalog?.agents.length ?? 0,
+      standalone:
+        catalog?.agents.filter((agent) => agent.agentType === "standalone").length ?? 0,
+      embedded:
+        catalog?.agents.filter((agent) => agent.agentType === "embedded").length ?? 0,
+    }),
+    [catalog],
+  );
+
+  const agentCategoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const agent of agentsByType) {
+      counts[agent.categoryCode] = (counts[agent.categoryCode] ?? 0) + 1;
+    }
+    return counts;
+  }, [agentsByType]);
+
   const filteredAgents = useMemo(() => {
     if (!catalog) return [];
     return sortAgentList(
-      filterAgents(catalog.agents, { query, category, price, access, site }),
+      filterAgents(catalog.agents, { query, category, agentType, price, access, site }),
       agentSort,
       locale,
     );
-  }, [catalog, query, category, price, access, site, agentSort, locale]);
+  }, [catalog, query, category, agentType, price, access, site, agentSort, locale]);
 
   const filteredSkills = useMemo(() => {
     if (!catalog) return [];
@@ -333,6 +370,7 @@ export function App() {
   const clearAgentFilters = useCallback(() => {
     setQuery("");
     setCategory("");
+    setAgentType("all");
     setPrice("all");
     setAccess("all");
     setSite("all");
@@ -385,14 +423,25 @@ export function App() {
     const match = catalog.categories.find(
       (item) => item.code === category && item.level === 1,
     );
+    if (!match) {
+      setCategory("");
+      return;
+    }
+    if (tab === "skills" && match.skillCount === 0) {
+      setCategory("");
+      return;
+    }
     if (
-      !match ||
-      (tab === "agents" && match.agentCount === 0) ||
-      (tab === "skills" && match.skillCount === 0)
+      tab === "agents" &&
+      !catalog.agents.some(
+        (agent) =>
+          agent.categoryCode === category &&
+          (agentType === "all" || agent.agentType === agentType),
+      )
     ) {
       setCategory("");
     }
-  }, [catalog, category, tab]);
+  }, [catalog, category, tab, agentType]);
 
   useEffect(() => {
     if (!catalog || !detail) return;
@@ -409,6 +458,7 @@ export function App() {
     if (tab !== "agents") params.set("tab", tab);
     if (query) params.set("q", query);
     if (category) params.set("cat", category);
+    if (agentType !== "all") params.set("atype", agentType);
     if (price !== "all") params.set("price", price);
     if (access !== "all") params.set("access", access);
     if (site !== "all") params.set("site", site);
@@ -435,6 +485,7 @@ export function App() {
     tab,
     query,
     category,
+    agentType,
     price,
     access,
     site,
@@ -470,6 +521,8 @@ export function App() {
     onToken: setToken,
     categoryColors,
     onClear: tab === "agents" ? clearAgentFilters : clearSkillFilters,
+    categoryCounts: tab === "agents" ? agentCategoryCounts : undefined,
+    totalCount: tab === "agents" ? agentsByType.length : undefined,
   };
 
   return (
@@ -513,6 +566,7 @@ export function App() {
               activeCategory={category}
               onSelect={setCategory}
               categoryColors={categoryColors}
+              counts={tab === "agents" ? agentCategoryCounts : undefined}
             />
             <section id="workspace" className="bg-mist">
               <div className="mx-auto max-w-[1600px] px-4 py-6 lg:px-6">
@@ -523,13 +577,16 @@ export function App() {
                   {tab === "agents" ? (
                     <AgentBrowser
                       agents={filteredAgents}
-                      totalCount={catalog.meta.agentCount}
+                      totalCount={agentsByType.length}
                       categories={catalog.categories}
                       categoryColors={categoryColors}
                       query={query}
                       onQuery={setQuery}
                       sort={agentSort}
                       onSort={setAgentSort}
+                      agentType={agentType}
+                      onAgentType={setAgentType}
+                      typeCounts={typeCounts}
                       category={category}
                       onCategory={setCategory}
                       price={price}

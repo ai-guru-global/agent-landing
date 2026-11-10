@@ -27,6 +27,8 @@ interface FilterRailProps {
   categoryColors: Record<string, string>;
   onClear: () => void;
   onClose?: () => void;
+  categoryCounts?: Record<string, number>;
+  totalCount?: number;
 }
 
 export function FilterRail({
@@ -45,16 +47,21 @@ export function FilterRail({
   categoryColors,
   onClear,
   onClose,
+  categoryCounts,
+  totalCount,
 }: FilterRailProps) {
   const { t, locale } = useI18n();
+  const countFor = (item: Category) =>
+    categoryCounts
+      ? (categoryCounts[item.code] ?? 0)
+      : tab === "skills"
+        ? item.skillCount
+        : item.agentCount;
   const topLevel = categories
     .filter((item) => item.level === 1)
-    .filter((item) => (tab === "skills" ? item.skillCount : item.agentCount) > 0)
-    .sort(
-      (a, b) =>
-        (tab === "skills" ? b.skillCount : b.agentCount) -
-        (tab === "skills" ? a.skillCount : a.agentCount),
-    );
+    .filter((item) => countFor(item) > 0)
+    .sort((a, b) => countFor(b) - countFor(a));
+  const total = totalCount ?? topLevel.reduce((sum, item) => sum + countFor(item), 0);
 
   const radios = <T extends string>(
     value: T,
@@ -114,13 +121,7 @@ export function FilterRail({
             >
               <span>{t("filter.all")}</span>
               <span className="alm-mono text-[10px] text-soft">
-                {formatNumber(
-                  topLevel.reduce(
-                    (sum, item) => sum + (tab === "skills" ? item.skillCount : item.agentCount),
-                    0,
-                  ),
-                  locale,
-                )}
+                {formatNumber(total, locale)}
               </span>
             </button>
             {topLevel.map((item) => (
@@ -138,7 +139,7 @@ export function FilterRail({
                   </span>
                 </span>
                 <span className="alm-mono text-[10px] text-soft">
-                  {tab === "skills" ? item.skillCount : item.agentCount}
+                  {formatNumber(countFor(item), locale)}
                 </span>
               </button>
             ))}

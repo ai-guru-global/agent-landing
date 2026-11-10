@@ -3,6 +3,7 @@
  * Fetch the public Alibaba Cloud Agent Catalog into public/data/catalog.json.
  * Usage: npm run fetch
  */
+import { readFileSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -14,6 +15,13 @@ const OUT = resolve(
 );
 const CONCURRENCY = 6;
 const RETRIES = 3;
+
+const agentTypeConfig = JSON.parse(
+  readFileSync(new URL("./agent-types.json", import.meta.url), "utf8"),
+);
+const agentTypes = new Map();
+for (const id of agentTypeConfig.standalone || []) agentTypes.set(id, "standalone");
+for (const id of agentTypeConfig.embedded || []) agentTypes.set(id, "embedded");
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -200,6 +208,13 @@ async function main() {
   }
   agents.forEach((agent, index) => {
     agent.catalogId = `AL-${String(index + 1).padStart(2, "0")}`;
+    const agentType = agentTypes.get(agent.id);
+    agent.agentType = agentType ?? "embedded";
+    if (!agentType) {
+      console.warn(
+        `  ! agent type not classified for ${agent.id} (${agent.name}); defaulting to embedded`,
+      );
+    }
   });
   skills.forEach((skill, index) => {
     skill.catalogId = `SK-${String(index + 1).padStart(3, "0")}`;
@@ -207,6 +222,10 @@ async function main() {
   const active = topLevel.filter(
     (category) => (category.skillsCount || 0) + (category.agentCount || 0) > 0,
   );
+  const agentTypeCounts = {
+    standalone: agents.filter((agent) => agent.agentType === "standalone").length,
+    embedded: agents.filter((agent) => agent.agentType === "embedded").length,
+  };
 
   const snapshot = {
     meta: {
@@ -219,6 +238,8 @@ async function main() {
       skillCount: skills.length,
       categoryCount: topLevel.length,
       activeCategoryCount: active.length,
+      agentTypeCounts,
+      agentTypeSource: "scripts/agent-types.json",
     },
     categories: categories.map((category) => ({
       code: category.categoryCode,
